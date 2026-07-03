@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>お蕎麦在庫管理 | 入出庫登録</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script type="module" src="script.js"></script>
+  </head>
+  <body data-page="register">
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">業務用在庫管理</p>
+          <h1>お蕎麦在庫管理</h1>
+        </div>
+        <nav class="topnav" aria-label="メインナビゲーション">
+          <a class="nav-link" href="index.html" data-nav-target="index.html" data-nav-message="ダッシュボードを表示しています">ダッシュボード</a>
+          <a class="nav-link" href="inventory.html" data-nav-target="inventory.html" data-nav-message="在庫一覧を表示しています">在庫一覧</a>
+          <a class="nav-link active" href="register.html" data-nav-target="register.html" data-nav-message="入出庫登録画面を開きます">入出庫登録</a>
+        </nav>
+      </header>
+
+      <main class="register-page">
+        <section class="page-header">
+          <div>
+            <p class="section-label">在庫の更新</p>
+            <h2>入出庫登録</h2>
+          </div>
+          <div class="page-actions">
+            <a class="secondary-btn text-button" href="inventory.html" data-nav-target="inventory.html" data-nav-message="在庫一覧を表示しています">一覧に戻る</a>
+            <button class="primary-btn" type="submit" form="stock-form">登録する</button>
+          </div>
+        </section>
+
+        <section class="form-card" aria-label="入出庫フォーム">
+          <form id="stock-form">
+            <div class="form-grid">
+            <label class="field">
+              <span>日付</span>
+              <input type="date" name="date" value="2026-07-04" />
+            </label>
+
+            <label class="field">
+              <span>品目</span>
+              <select name="item">
+                <option>そば粉A</option>
+                <option>そば粉B</option>
+                <option>そば粉C</option>
+                <option>そば粉D</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span>種別</span>
+              <select name="type">
+                <option>仕入れ</option>
+                <option>使用</option>
+                <option>廃棄</option>
+                <option>その他</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span>数量</span>
+              <input type="number" name="quantity" value="5" min="1" />
+            </label>
+
+            <label class="field full-width">
+              <span>メモ</span>
+              <textarea name="note" rows="4" placeholder="例：仕入れた、試食分を使用したなど"></textarea>
+            </label>
+            </div>
+
+          <div class="form-actions">
+            <a class="secondary-btn text-button" href="inventory.html" data-nav-target="inventory.html" data-nav-message="在庫一覧を表示しています">キャンセル</a>
+            <button class="primary-btn" type="submit">登録する</button>
+          </div>
+          </form>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

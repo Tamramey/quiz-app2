@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>お蕎麦在庫管理 | ダッシュボード</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script type="module" src="script.js"></script>
+  </head>
+  <body data-page="dashboard">
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">業務用在庫管理</p>
+          <h1>お蕎麦在庫管理</h1>
+        </div>
+        <nav class="topnav" aria-label="メインナビゲーション">
+          <a class="nav-link active" href="index.html" data-nav-target="index.html" data-nav-message="ダッシュボードを表示しています">ダッシュボード</a>
+          <a class="nav-link" href="inventory.html" data-nav-target="inventory.html" data-nav-message="在庫一覧を表示しています">在庫一覧</a>
+          <a class="nav-link" href="register.html" data-nav-target="register.html" data-nav-message="入出庫登録画面を開きます">入出庫登録</a>
+        </nav>
+      </header>
+
+      <main class="dashboard">
+        <section class="page-header">
+          <div>
+            <p class="section-label">今日の状況</p>
+            <h2>ダッシュボード</h2>
+          </div>
+          <a class="primary-btn" href="register.html" data-nav-target="register.html" data-nav-message="入出庫登録画面を開きます">＋ 入出庫登録</a>
+        </section>
+
+        <section class="summary-grid" aria-label="在庫サマリー">
+          <article class="summary-card accent-blue">
+            <p class="card-label">現在の在庫</p>
+            <h3 id="current-stock">12 袋</h3>
+            <span>前日比 +2 袋</span>
+          </article>
+          <article class="summary-card accent-amber">
+            <p class="card-label">要発注</p>
+            <h3 id="need-order">2 件</h3>
+            <span>最低在庫を下回っています</span>
+          </article>
+          <article class="summary-card accent-green">
+            <p class="card-label">今日の使用量</p>
+            <h3 id="today-usage">3 袋</h3>
+            <span>本日の消費ペース</span>
+          </article>
+        </section>
+
+        <section class="content-grid">
+          <article class="panel">
+            <div class="panel-header">
+              <h3>要注意の品目</h3>
+              <a href="inventory.html" class="text-link" data-nav-target="inventory.html" data-nav-message="在庫一覧を表示しています">一覧を見る</a>
+            </div>
+            <ul class="item-list" id="alert-list">
+            </ul>
+          </article>
+
+          <article class="panel">
+            <div class="panel-header">
+              <h3>クイック操作</h3>
+            </div>
+            <div class="quick-actions">
+              <a class="secondary-btn" href="inventory.html" data-nav-target="inventory.html" data-nav-message="在庫一覧を表示しています">在庫一覧</a>
+              <a class="secondary-btn" href="register.html" data-nav-target="register.html" data-nav-message="入出庫登録画面を開きます">入出庫を記録</a>
+              <a class="secondary-btn" href="#">発注予定を見る</a>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
