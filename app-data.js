@@ -1,10 +1,7 @@
 export const STORAGE_KEY = 'soba-stock-data-v1';
 
 export const DEFAULT_ITEMS = [
-  { id: 1, name: 'そば粉A', stock: 12, minimum: 5, lastUpdated: '2026-07-04' },
-  { id: 2, name: 'そば粉B', stock: 2, minimum: 5, lastUpdated: '2026-07-03' },
-  { id: 3, name: 'そば粉C', stock: 0, minimum: 5, lastUpdated: '2026-07-02' },
-  { id: 4, name: 'そば粉D', stock: 8, minimum: 5, lastUpdated: '2026-07-04' }
+  { id: 1, name: '生そば', stock: 12, minimum: 5, lastUpdated: '2026-07-04' }
 ];
 
 export function cloneData(value) {
