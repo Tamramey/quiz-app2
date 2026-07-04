@@ -173,6 +173,23 @@ p {
   padding: 16px 18px;
 }
 
+.forecast-list {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.forecast-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 8px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+}
+
 .weather-icon {
   font-size: 2.2rem;
 }
