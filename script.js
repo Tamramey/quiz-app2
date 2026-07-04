@@ -48,10 +48,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const weatherTitle = document.getElementById('weather-summary-title');
     const weatherTemp = document.getElementById('weather-summary-temperature');
     const weatherIcon = document.getElementById('weather-summary-icon');
+    const weatherUpdatedAt = document.getElementById('weather-updated-at');
+    const weatherMessage = document.getElementById('weather-message');
     const dashboardForecast = document.getElementById('dashboard-forecast-list');
     const registerWeatherCard = document.getElementById('register-weather-card');
     const registerTitle = document.getElementById('register-weather-title');
     const registerSummary = document.getElementById('register-weather-summary');
+    const registerUpdatedAt = document.getElementById('register-updated-at');
+    const registerMessage = document.getElementById('register-weather-message');
     const registerForecast = document.getElementById('register-forecast-list');
 
     try {
@@ -64,18 +68,30 @@ document.addEventListener('DOMContentLoaded', () => {
       const todayMin = daily.temperature_2m_min?.[0];
       const isRainy = [61, 63, 65, 80, 81, 82, 95, 96, 99].includes(todayWeatherCode);
       const weatherText = getWeatherLabel(todayWeatherCode);
-      const icon = isRainy ? '🌧️' : '☀️';
+      const icon = getWeatherIcon(todayWeatherCode);
+      const updatedAtText = new Date().toLocaleString('ja-JP', {
+        timeZone: 'Asia/Tokyo',
+        month: 'numeric',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit'
+      });
+      const rainyMessage = isRainy ? '雨の日は発注を考えよう' : '';
 
       if (weatherCard) weatherCard.classList.toggle('rainy', isRainy);
       if (registerWeatherCard) registerWeatherCard.classList.toggle('rainy', isRainy);
       if (weatherTitle) weatherTitle.textContent = weatherText;
       if (weatherTemp) weatherTemp.textContent = `最高 ${todayMax}℃・最低 ${todayMin}℃`;
       if (weatherIcon) weatherIcon.textContent = icon;
+      if (weatherUpdatedAt) weatherUpdatedAt.textContent = `更新: ${updatedAtText}`;
+      if (weatherMessage) weatherMessage.textContent = rainyMessage;
       if (registerTitle) registerTitle.textContent = `${weatherText} / ${todayMax}℃`;
       if (registerSummary) registerSummary.textContent = `最低 ${todayMin}℃・${isRainy ? '雨の予報' : '晴れの予報'}`;
+      if (registerUpdatedAt) registerUpdatedAt.textContent = `更新: ${updatedAtText}`;
+      if (registerMessage) registerMessage.textContent = rainyMessage;
 
       const forecastItems = (daily.time || []).slice(0, 5).map((date, index) => {
-        const code = daily.weathercode?.[index];
+          const code = daily.weathercode?.[index];
         const max = daily.temperature_2m_max?.[index];
         const min = daily.temperature_2m_min?.[index];
         const isRainyDay = [61, 63, 65, 80, 81, 82, 95, 96, 99].includes(code);
@@ -83,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return `
           <div class="forecast-item ${isRainyDay ? 'rainy' : ''}">
             <span>${label}</span>
-            <strong>${isRainyDay ? '🌧️' : '☀️'}</strong>
+            <strong>${getWeatherIcon(code)}</strong>
             <span>${Math.round(max)}℃</span>
           </div>
         `;
@@ -125,6 +141,33 @@ document.addEventListener('DOMContentLoaded', () => {
       99: '雷雨'
     };
     return map[code] || '晴れ';
+  };
+
+  const getWeatherIcon = (code) => {
+    const map = {
+      0: '☀️',
+      1: '☀️',
+      2: '🌤️',
+      3: '☁️',
+      45: '🌫️',
+      48: '🌫️',
+      51: '🌦️',
+      53: '🌧️',
+      55: '🌧️',
+      61: '🌧️',
+      63: '🌧️',
+      65: '⛈️',
+      71: '❄️',
+      73: '❄️',
+      75: '❄️',
+      80: '🌦️',
+      81: '🌧️',
+      82: '⛈️',
+      95: '⛈️',
+      96: '⛈️',
+      99: '⛈️'
+    };
+    return map[code] || '☁️';
   };
 
   const getDayLabel = (date) => {

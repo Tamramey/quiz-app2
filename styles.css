@@ -217,6 +217,23 @@ p {
   margin-top: 6px;
 }
 
+.weather-meta {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.weather-message {
+  margin-top: 8px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.weather-card.rainy .weather-message {
+  color: #355a8a;
+}
+
 .content-grid {
   display: grid;
   grid-template-columns: 1.3fr 0.7fr;
