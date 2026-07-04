@@ -90,6 +90,78 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  const dateInput = document.getElementById('date-input');
+  const calendarTitle = document.getElementById('calendar-title');
+  const calendarGrid = document.getElementById('calendar-grid');
+
+  if (dateInput && calendarTitle && calendarGrid) {
+    let currentDate = new Date(dateInput.value || new Date());
+
+    const renderCalendar = () => {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      calendarTitle.textContent = `${year}/${String(month + 1).padStart(2, '0')}`;
+
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const firstWeekday = firstDay.getDay();
+      const daysInMonth = lastDay.getDate();
+      const weekDays = ['日', '月', '火', '水', '木', '金', '土'];
+
+      calendarGrid.innerHTML = '';
+      weekDays.forEach((day) => {
+        const dayLabel = document.createElement('div');
+        dayLabel.className = 'calendar-weekday';
+        dayLabel.textContent = day;
+        calendarGrid.appendChild(dayLabel);
+      });
+
+      for (let i = 0; i < firstWeekday; i += 1) {
+        const emptyCell = document.createElement('div');
+        emptyCell.className = 'calendar-day';
+        emptyCell.textContent = '';
+        calendarGrid.appendChild(emptyCell);
+      }
+
+      for (let day = 1; day <= daysInMonth; day += 1) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'calendar-day';
+        button.textContent = String(day);
+
+        const dateValue = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        if (dateInput.value === dateValue) {
+          button.classList.add('is-selected');
+        }
+        if (new Date().toDateString() === new Date(year, month, day).toDateString()) {
+          button.classList.add('is-today');
+        }
+
+        button.addEventListener('click', () => {
+          dateInput.value = dateValue;
+          renderCalendar();
+        });
+
+        calendarGrid.appendChild(button);
+      }
+    };
+
+    document.querySelectorAll('[data-calendar-nav]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const direction = button.getAttribute('data-calendar-nav');
+        currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + (direction === 'next' ? 1 : -1), 1);
+        renderCalendar();
+      });
+    });
+
+    dateInput.addEventListener('change', () => {
+      currentDate = new Date(dateInput.value || new Date());
+      renderCalendar();
+    });
+
+    renderCalendar();
+  }
+
   const form = document.getElementById('stock-form');
   if (form) {
     form.addEventListener('submit', (event) => {

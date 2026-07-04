@@ -305,6 +305,65 @@ p {
   margin-top: 20px;
 }
 
+.calendar-card {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px;
+  background: var(--surface-soft);
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.calendar-nav {
+  border: none;
+  background: var(--surface);
+  color: var(--primary-dark);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.calendar-day,
+.calendar-weekday {
+  text-align: center;
+  font-size: 0.85rem;
+  padding: 6px 0;
+  border-radius: 8px;
+}
+
+.calendar-weekday {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.calendar-day {
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.calendar-day.is-today {
+  background: var(--primary);
+  color: white;
+}
+
+.calendar-day.is-selected {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
 .text-link {
   text-decoration: none;
   font-weight: 600;

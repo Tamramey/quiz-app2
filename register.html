@@ -44,7 +44,7 @@
             <div class="form-grid">
             <label class="field">
               <span>日付</span>
-              <input type="date" name="date" value="2026-07-04" />
+              <input type="date" name="date" id="date-input" value="2026-07-04" />
             </label>
 
             <label class="field">
@@ -68,6 +68,18 @@
               <span>数量</span>
               <input type="number" name="quantity" value="5" min="1" />
             </label>
+
+            <div class="field full-width">
+              <span>カレンダー</span>
+              <div class="calendar-card">
+                <div class="calendar-header">
+                  <button class="calendar-nav" type="button" data-calendar-nav="prev">←</button>
+                  <strong id="calendar-title">2026/07</strong>
+                  <button class="calendar-nav" type="button" data-calendar-nav="next">→</button>
+                </div>
+                <div class="calendar-grid" id="calendar-grid"></div>
+              </div>
+            </div>
 
             <label class="field full-width">
               <span>メモ</span>
