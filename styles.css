@@ -154,6 +154,30 @@ p {
   background: var(--green);
 }
 
+.weather-panel {
+  margin-bottom: 16px;
+}
+
+.weather-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, #fff7d9, #eaf4ff);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(47, 36, 29, 0.04);
+}
+
+.weather-icon {
+  font-size: 2.2rem;
+}
+
+.weather-detail {
+  color: var(--muted);
+  margin-top: 6px;
+}
+
 .content-grid {
   display: grid;
   grid-template-columns: 1.3fr 0.7fr;
