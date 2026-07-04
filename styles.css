@@ -169,6 +169,10 @@ p {
   box-shadow: 0 8px 24px rgba(47, 36, 29, 0.04);
 }
 
+.compact-weather {
+  padding: 16px 18px;
+}
+
 .weather-icon {
   font-size: 2.2rem;
 }
