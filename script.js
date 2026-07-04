@@ -43,6 +43,96 @@ document.addEventListener('DOMContentLoaded', () => {
   const state = loadAppData(window.localStorage);
   const currentPage = document.body.dataset.page;
 
+  const renderWeather = async () => {
+    const weatherCard = document.getElementById('weather-card');
+    const weatherTitle = document.getElementById('weather-summary-title');
+    const weatherTemp = document.getElementById('weather-summary-temperature');
+    const weatherIcon = document.getElementById('weather-summary-icon');
+    const dashboardForecast = document.getElementById('dashboard-forecast-list');
+    const registerWeatherCard = document.getElementById('register-weather-card');
+    const registerTitle = document.getElementById('register-weather-title');
+    const registerSummary = document.getElementById('register-weather-summary');
+    const registerForecast = document.getElementById('register-forecast-list');
+
+    try {
+      const response = await fetch('https://api.open-meteo.com/v1/forecast?latitude=35.6895&longitude=139.6917&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=Asia%2FTokyo');
+      const data = await response.json();
+      const daily = data.daily;
+      const today = daily.time?.[0];
+      const todayWeatherCode = daily.weathercode?.[0];
+      const todayMax = daily.temperature_2m_max?.[0];
+      const todayMin = daily.temperature_2m_min?.[0];
+      const isRainy = [61, 63, 65, 80, 81, 82, 95, 96, 99].includes(todayWeatherCode);
+      const weatherText = getWeatherLabel(todayWeatherCode);
+      const icon = isRainy ? '🌧️' : '☀️';
+
+      if (weatherCard) weatherCard.classList.toggle('rainy', isRainy);
+      if (registerWeatherCard) registerWeatherCard.classList.toggle('rainy', isRainy);
+      if (weatherTitle) weatherTitle.textContent = weatherText;
+      if (weatherTemp) weatherTemp.textContent = `最高 ${todayMax}℃・最低 ${todayMin}℃`;
+      if (weatherIcon) weatherIcon.textContent = icon;
+      if (registerTitle) registerTitle.textContent = `${weatherText} / ${todayMax}℃`;
+      if (registerSummary) registerSummary.textContent = `最低 ${todayMin}℃・${isRainy ? '雨の予報' : '晴れの予報'}`;
+
+      const forecastItems = (daily.time || []).slice(0, 5).map((date, index) => {
+        const code = daily.weathercode?.[index];
+        const max = daily.temperature_2m_max?.[index];
+        const min = daily.temperature_2m_min?.[index];
+        const isRainyDay = [61, 63, 65, 80, 81, 82, 95, 96, 99].includes(code);
+        const label = getDayLabel(date);
+        return `
+          <div class="forecast-item ${isRainyDay ? 'rainy' : ''}">
+            <span>${label}</span>
+            <strong>${isRainyDay ? '🌧️' : '☀️'}</strong>
+            <span>${Math.round(max)}℃</span>
+          </div>
+        `;
+      });
+
+      if (dashboardForecast) dashboardForecast.innerHTML = forecastItems.join('');
+      if (registerForecast) registerForecast.innerHTML = forecastItems.join('');
+    } catch (error) {
+      if (weatherTitle) weatherTitle.textContent = '天気取得失敗';
+      if (weatherTemp) weatherTemp.textContent = '再読み込みしてください';
+      if (weatherIcon) weatherIcon.textContent = '☁️';
+      if (registerTitle) registerTitle.textContent = '天気取得失敗';
+      if (registerSummary) registerSummary.textContent = '再読み込みしてください';
+    }
+  };
+
+  const getWeatherLabel = (code) => {
+    const map = {
+      0: '快晴',
+      1: '晴れ',
+      2: '晴れ時々曇',
+      3: '曇り',
+      45: '霧',
+      48: '霧',
+      51: '小雨',
+      53: '雨',
+      55: '雨',
+      61: '雨',
+      63: '雨',
+      65: '大雨',
+      71: '雪',
+      73: '雪',
+      75: '雪',
+      80: 'にわか雨',
+      81: '雨',
+      82: '大雨',
+      95: '雷雨',
+      96: '雷雨',
+      99: '雷雨'
+    };
+    return map[code] || '晴れ';
+  };
+
+  const getDayLabel = (date) => {
+    const targetDate = new Date(date);
+    const week = ['日', '月', '火', '水', '木', '金', '土'];
+    return week[targetDate.getDay()];
+  };
+
   if (currentPage === 'dashboard') {
     const summary = getStockSummary(state.items, state.entries);
     const alertItems = getAlertItems(state.items);
@@ -161,6 +251,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     renderCalendar();
   }
+
+  renderWeather();
 
   const form = document.getElementById('stock-form');
   if (form) {

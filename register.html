@@ -83,34 +83,12 @@
 
             <div class="field full-width">
               <span>週間天気</span>
-              <div class="weather-card compact-weather">
-                <div class="forecast-list">
-                  <div class="forecast-item">
-                    <span>今日</span>
-                    <strong>☀️</strong>
-                    <span>32℃</span>
-                  </div>
-                  <div class="forecast-item">
-                    <span>明日</span>
-                    <strong>🌤️</strong>
-                    <span>31℃</span>
-                  </div>
-                  <div class="forecast-item">
-                    <span>水曜</span>
-                    <strong>☁️</strong>
-                    <span>29℃</span>
-                  </div>
-                  <div class="forecast-item">
-                    <span>木曜</span>
-                    <strong>🌦️</strong>
-                    <span>27℃</span>
-                  </div>
-                  <div class="forecast-item">
-                    <span>金曜</span>
-                    <strong>🌧️</strong>
-                    <span>25℃</span>
-                  </div>
+              <div class="weather-card compact-weather" id="register-weather-card">
+                <div class="forecast-summary">
+                  <strong id="register-weather-title">読み込み中…</strong>
+                  <p class="weather-detail" id="register-weather-summary">取得中</p>
                 </div>
+                <div class="forecast-list" id="register-forecast-list"></div>
               </div>
             </div>
 
