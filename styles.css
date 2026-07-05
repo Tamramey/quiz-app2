@@ -164,9 +164,19 @@ p {
 .dashboard-area {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: 20px;
   padding: 18px;
   box-shadow: 0 8px 24px rgba(47, 36, 29, 0.04);
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-area::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), #c58b5b);
 }
 
 .area-header {
@@ -174,6 +184,13 @@ p {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.area-header h3 {
+  font-size: 1rem;
+  color: var(--primary-dark);
 }
 
 .area-pill {
@@ -181,7 +198,7 @@ p {
   align-items: center;
   padding: 4px 8px;
   border-radius: 999px;
-  background: var(--surface-soft);
+  background: var(--amber);
   color: var(--primary);
   font-size: 0.8rem;
   font-weight: 700;
@@ -191,6 +208,7 @@ p {
   color: var(--primary);
   font-weight: 700;
   margin-bottom: 10px;
+  font-size: 0.95rem;
 }
 
 .mini-calendar {
@@ -220,12 +238,14 @@ p {
   border-radius: 8px;
   background: var(--surface-soft);
   font-size: 0.9rem;
+  border: 1px solid transparent;
 }
 
 .mini-calendar-day.is-today {
-  background: var(--primary);
+  background: linear-gradient(135deg, var(--primary), #b36b3f);
   color: white;
   font-weight: 700;
+  box-shadow: 0 4px 10px rgba(138, 75, 31, 0.16);
 }
 
 .weather-card {
