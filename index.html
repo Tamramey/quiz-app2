@@ -54,18 +54,43 @@
           </article>
         </section>
 
-        <section class="weather-panel">
-          <div class="weather-card" id="weather-card">
-            <div>
-              <p class="card-label">今日の天気</p>
-              <h3 id="weather-summary-title">読み込み中…</h3>
-              <p class="weather-detail" id="weather-summary-temperature">取得中</p>
-              <p class="weather-meta" id="weather-updated-at">更新中</p>
-              <p class="weather-message" id="weather-message" aria-live="polite"></p>
+        <section class="dashboard-areas" aria-label="主要情報エリア">
+          <article class="dashboard-area">
+            <div class="area-header">
+              <h3>カレンダー</h3>
+              <span class="area-pill">今日</span>
             </div>
-            <div class="weather-icon" id="weather-summary-icon">⏳</div>
-          </div>
-          <div class="forecast-list" id="dashboard-forecast-list"></div>
+            <p class="area-date" id="dashboard-current-date">読み込み中…</p>
+            <div class="mini-calendar" id="dashboard-mini-calendar"></div>
+          </article>
+
+          <article class="dashboard-area weather-area">
+            <div class="area-header">
+              <h3>天気予報</h3>
+              <span class="area-pill">東京</span>
+            </div>
+            <div class="weather-card compact-weather" id="weather-card">
+              <div>
+                <p class="card-label">今日の天気</p>
+                <h3 id="weather-summary-title">読み込み中…</h3>
+                <p class="weather-detail" id="weather-summary-temperature">取得中</p>
+                <p class="weather-meta" id="weather-updated-at">更新中</p>
+                <p class="weather-message" id="weather-message" aria-live="polite"></p>
+              </div>
+              <div class="weather-icon" id="weather-summary-icon">⏳</div>
+            </div>
+            <div class="forecast-list" id="dashboard-forecast-list"></div>
+          </article>
+
+          <article class="dashboard-area order-area">
+            <div class="area-header">
+              <h3>発注数</h3>
+              <span class="area-pill">要確認</span>
+            </div>
+            <div class="order-amount" id="dashboard-order-count">0件</div>
+            <p class="order-summary" id="dashboard-order-summary">今のところ発注は不要です</p>
+            <ul class="mini-order-list" id="dashboard-order-list"></ul>
+          </article>
         </section>
 
         <section class="content-grid">

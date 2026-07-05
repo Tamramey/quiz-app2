@@ -184,10 +184,58 @@ document.addEventListener('DOMContentLoaded', () => {
     const needOrderEl = document.getElementById('need-order');
     const todayUsageEl = document.getElementById('today-usage');
     const alertListEl = document.getElementById('alert-list');
+    const dashboardDateEl = document.getElementById('dashboard-current-date');
+    const dashboardMiniCalendarEl = document.getElementById('dashboard-mini-calendar');
+    const dashboardOrderCountEl = document.getElementById('dashboard-order-count');
+    const dashboardOrderSummaryEl = document.getElementById('dashboard-order-summary');
+    const dashboardOrderListEl = document.getElementById('dashboard-order-list');
 
     if (currentStockEl) currentStockEl.textContent = `${summary.currentStock} 袋`;
     if (needOrderEl) needOrderEl.textContent = `${summary.needOrderCount} 件`;
     if (todayUsageEl) todayUsageEl.textContent = `${summary.todayUsage} 袋`;
+
+    if (dashboardDateEl) {
+      const today = new Date();
+      dashboardDateEl.textContent = `${today.getFullYear()}年${String(today.getMonth() + 1).padStart(2, '0')}月${String(today.getDate()).padStart(2, '0')}日`;
+    }
+
+    if (dashboardMiniCalendarEl) {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = today.getMonth();
+      const firstDay = new Date(year, month, 1);
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const firstWeekday = firstDay.getDay();
+      const cells = [];
+      for (let i = 0; i < firstWeekday; i += 1) cells.push('');
+      for (let day = 1; day <= daysInMonth; day += 1) cells.push(day);
+      while (cells.length % 7 !== 0) cells.push('');
+
+      const weekdayLabels = ['日', '月', '火', '水', '木', '金', '土'];
+      const header = weekdayLabels.map((label) => `<span class="mini-calendar-weekday">${label}</span>`).join('');
+      const body = cells.map((day) => {
+        const isToday = day && Number(day) === today.getDate();
+        return `<span class="mini-calendar-day${isToday ? ' is-today' : ''}">${day || ''}</span>`;
+      }).join('');
+
+      dashboardMiniCalendarEl.innerHTML = `<div class="mini-calendar-header">${header}</div><div class="mini-calendar-body">${body}</div>`;
+    }
+
+    if (dashboardOrderCountEl) {
+      const orderCount = alertItems.length;
+      dashboardOrderCountEl.textContent = `${orderCount}件`;
+    }
+
+    if (dashboardOrderSummaryEl) {
+      const orderCount = alertItems.length;
+      dashboardOrderSummaryEl.textContent = orderCount > 0 ? '発注の確認を進めましょう' : '今のところ発注は不要です';
+    }
+
+    if (dashboardOrderListEl) {
+      dashboardOrderListEl.innerHTML = alertItems.length
+        ? alertItems.slice(0, 3).map((item) => `<li>${item.name}：残り ${item.stock} 袋</li>`).join('')
+        : '<li>発注候補はありません</li>';
+    }
 
     if (alertListEl) {
       alertListEl.innerHTML = alertItems.length
