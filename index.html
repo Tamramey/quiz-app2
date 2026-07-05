@@ -1,120 +1,475 @@
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>お蕎麦在庫管理 | ダッシュボード</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="styles.css" />
-    <script type="module" src="script.js"></script>
-  </head>
-  <body data-page="dashboard">
-    <div class="app-shell">
-      <header class="topbar">
-        <div>
-          <p class="eyebrow">業務用在庫管理</p>
-          <h1>お蕎麦在庫管理</h1>
-        </div>
-        <nav class="topnav" aria-label="メインナビゲーション">
-          <a class="nav-link active" href="index.html" data-nav-target="index.html" data-nav-message="ダッシュボードを表示しています">ダッシュボード</a>
-          <a class="nav-link" href="inventory.html" data-nav-target="inventory.html" data-nav-message="在庫一覧を表示しています">在庫一覧</a>
-          <a class="nav-link" href="register.html" data-nav-target="register.html" data-nav-message="入出庫登録画面を開きます">入出庫登録</a>
-        </nav>
-      </header>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>お店ダッシュボード</title>
+<style>
+  :root{
+    --bg:#F4F5F1;
+    --card:#FFFFFF;
+    --ink:#22303F;
+    --sub:#6B7684;
+    --line:#E3E6E0;
+    --accent:#2B5FD9;      /* 瑠璃色:今日・主要アクション */
+    --warn:#C9412B;        /* 在庫少・雨 */
+    --ok:#2F8F5B;          /* 在庫OK・晴れ寄り */
+    --sat:#2B5FD9;
+    --sun:#C9412B;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic",Meiryo,sans-serif;
+    background:var(--bg);color:var(--ink);
+    padding:16px;max-width:1080px;margin:0 auto;
+    line-height:1.6;
+  }
+  header{
+    display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;
+    margin-bottom:16px;
+  }
+  header h1{font-size:1.1rem;font-weight:600;letter-spacing:.06em;color:var(--sub)}
+  #todayLabel{font-size:1.5rem;font-weight:700}
+  .grid{
+    display:grid;gap:16px;
+    grid-template-columns:1fr;
+  }
+  @media(min-width:760px){
+    .grid{grid-template-columns:1.2fr 1fr}
+    #forecastCard{grid-column:1 / -1}
+  }
+  .card{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:var(--radius);padding:16px;
+  }
+  .card h2{
+    font-size:.95rem;font-weight:700;color:var(--sub);
+    letter-spacing:.08em;margin-bottom:12px;
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  /* ---------- 出数予測 ---------- */
+  #forecastCard{
+    display:flex;flex-wrap:wrap;gap:16px;align-items:center;
+    border-left:6px solid var(--accent);
+  }
+  .big-number{
+    font-size:3.4rem;font-weight:800;line-height:1;
+    font-variant-numeric:tabular-nums;
+  }
+  .big-number small{font-size:1.1rem;font-weight:600;color:var(--sub);margin-left:4px}
+  .forecast-note{color:var(--sub);font-size:.85rem;flex:1;min-width:220px}
+  .record-box{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .record-box input[type=number]{
+    width:90px;padding:8px;border:1px solid var(--line);border-radius:8px;
+    font-size:1rem;
+  }
+  button{
+    font-family:inherit;font-size:.9rem;cursor:pointer;
+    border:none;border-radius:8px;padding:8px 14px;
+    background:var(--accent);color:#fff;font-weight:600;
+  }
+  button.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+  button:active{opacity:.8}
+  /* ---------- 天気 ---------- */
+  .weather-days{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+  .wday{
+    min-width:88px;flex:1;text-align:center;
+    border:1px solid var(--line);border-radius:10px;padding:10px 6px;
+    background:#FAFBF8;
+  }
+  .wday.today{border-color:var(--accent);background:#EEF3FF}
+  .wday .d{font-size:.8rem;color:var(--sub)}
+  .wday .icon{font-size:1.7rem;line-height:1.4}
+  .wday .t{font-size:.9rem;font-weight:700}
+  .wday .t .lo{color:var(--sub);font-weight:500}
+  .wday .p{font-size:.75rem;color:var(--warn)}
+  .weather-fallback{font-size:.85rem;color:var(--sub);margin-top:8px}
+  /* ---------- カレンダー ---------- */
+  table.cal{width:100%;border-collapse:collapse;table-layout:fixed}
+  .cal th{font-size:.75rem;color:var(--sub);padding:4px 0;font-weight:600}
+  .cal th.sat{color:var(--sat)} .cal th.sun{color:var(--sun)}
+  .cal td{
+    text-align:center;padding:2px;height:52px;vertical-align:top;
+    font-size:.9rem;cursor:pointer;border-radius:8px;
+  }
+  .cal td:hover{background:#EEF1EA}
+  .cal td .num{display:inline-block;width:26px;height:26px;line-height:26px;border-radius:50%}
+  .cal td.today .num{background:var(--accent);color:#fff;font-weight:700}
+  .cal td.sat .num{color:var(--sat)} .cal td.sun .num,.cal td.holiday .num{color:var(--sun)}
+  .cal td .mark{display:block;font-size:.65rem;color:var(--ok);line-height:1.2;font-variant-numeric:tabular-nums}
+  .cal-head{display:flex;align-items:center;gap:12px}
+  .cal-head b{font-size:1rem}
+  .cal-head button{padding:2px 10px;background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .holiday-name{font-size:.6rem;color:var(--sun);display:block;line-height:1.1}
+  /* ---------- 在庫 ---------- */
+  ul.stock{list-style:none}
+  ul.stock li{
+    display:flex;align-items:center;gap:8px;
+    padding:8px 0;border-bottom:1px dashed var(--line);
+  }
+  ul.stock li:last-child{border-bottom:none}
+  .stock-name{flex:1;font-weight:600}
+  .stock-qty{
+    min-width:64px;text-align:right;font-weight:700;
+    font-variant-numeric:tabular-nums;
+  }
+  .stock-qty .unit{font-size:.75rem;color:var(--sub);font-weight:500}
+  li.low .stock-qty{color:var(--warn)}
+  li.low .stock-name::after{content:" ⚠ 少";color:var(--warn);font-size:.75rem}
+  .qty-btn{
+    width:32px;height:32px;padding:0;border-radius:50%;
+    background:#EEF1EA;color:var(--ink);font-size:1.1rem;font-weight:700;
+  }
+  .del-btn{background:transparent;color:var(--sub);padding:4px;font-size:.9rem}
+  .add-row{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+  .add-row input{
+    padding:8px;border:1px solid var(--line);border-radius:8px;font-size:.9rem;
+  }
+  .add-row input.name{flex:1;min-width:110px}
+  .add-row input.num{width:70px}
+  .hint{font-size:.75rem;color:var(--sub);margin-top:8px}
+  dialog{
+    border:none;border-radius:var(--radius);padding:20px;max-width:320px;width:90%;
+  }
+  dialog::backdrop{background:rgba(30,40,50,.35)}
+  dialog h3{font-size:1rem;margin-bottom:10px}
+  dialog input{width:100%;padding:8px;border:1px solid var(--line);border-radius:8px;margin-bottom:12px}
+  .dlg-actions{display:flex;gap:8px;justify-content:flex-end}
+</style>
+</head>
+<body>
 
-      <main class="dashboard">
-        <section class="page-header">
-          <div>
-            <p class="section-label">今日の状況</p>
-            <h2>ダッシュボード</h2>
-          </div>
-          <a class="primary-btn" href="register.html" data-nav-target="register.html" data-nav-message="入出庫登録画面を開きます">＋ 入出庫登録</a>
-        </section>
+<header>
+  <h1>お店ダッシュボード</h1>
+  <div id="todayLabel"></div>
+</header>
 
-        <section class="summary-grid" aria-label="在庫サマリー">
-          <article class="summary-card accent-blue">
-            <p class="card-label">現在の在庫</p>
-            <h3 id="current-stock">12 袋</h3>
-            <span>前日比 +2 袋</span>
-          </article>
-          <article class="summary-card accent-amber">
-            <p class="card-label">要発注</p>
-            <h3 id="need-order">2 件</h3>
-            <span>最低在庫を下回っています</span>
-          </article>
-          <article class="summary-card accent-green">
-            <p class="card-label">今日の使用量</p>
-            <h3 id="today-usage">3 袋</h3>
-            <span>本日の消費ペース</span>
-          </article>
-        </section>
+<!-- 出数予測 -->
+<section class="card" id="forecastCard">
+  <div>
+    <h2>今日の出数(予想来客数)</h2>
+    <div class="big-number"><span id="forecastNum">--</span><small>人</small></div>
+  </div>
+  <div class="forecast-note" id="forecastNote">
+    実績を記録すると、曜日ごとの平均と天気から予想します。
+  </div>
+  <div class="record-box">
+    <label for="actualInput">今日の実績:</label>
+    <input type="number" id="actualInput" min="0" placeholder="例: 42">
+    <button onclick="saveActual()">記録する</button>
+  </div>
+</section>
 
-        <section class="dashboard-areas" aria-label="主要情報エリア">
-          <article class="dashboard-area">
-            <div class="area-header">
-              <h3>カレンダー</h3>
-              <span class="area-pill">今日</span>
-            </div>
-            <p class="area-date" id="dashboard-current-date">読み込み中…</p>
-            <div class="mini-calendar" id="dashboard-mini-calendar"></div>
-          </article>
+<div class="grid">
 
-          <article class="dashboard-area weather-area">
-            <div class="area-header">
-              <h3>天気予報</h3>
-              <span class="area-pill">東京</span>
-            </div>
-            <div class="weather-card compact-weather" id="weather-card">
-              <div>
-                <p class="card-label">今日の天気</p>
-                <h3 id="weather-summary-title">読み込み中…</h3>
-                <p class="weather-detail" id="weather-summary-temperature">取得中</p>
-                <p class="weather-meta" id="weather-updated-at">更新中</p>
-                <p class="weather-message" id="weather-message" aria-live="polite"></p>
-              </div>
-              <div class="weather-icon" id="weather-summary-icon">⏳</div>
-            </div>
-            <div class="forecast-list" id="dashboard-forecast-list"></div>
-          </article>
+  <!-- カレンダー -->
+  <section class="card">
+    <h2>
+      カレンダー
+      <span class="cal-head">
+        <button onclick="moveMonth(-1)">‹</button>
+        <b id="calTitle"></b>
+        <button onclick="moveMonth(1)">›</button>
+      </span>
+    </h2>
+    <table class="cal">
+      <thead><tr>
+        <th class="sun">日</th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th class="sat">土</th>
+      </tr></thead>
+      <tbody id="calBody"></tbody>
+    </table>
+    <p class="hint">日付をタップすると、その日の出数実績を記録・修正できます。緑の数字は記録済みの出数です。</p>
+  </section>
 
-          <article class="dashboard-area order-area">
-            <div class="area-header">
-              <h3>発注数</h3>
-              <span class="area-pill">要確認</span>
-            </div>
-            <div class="order-amount" id="dashboard-order-count">0件</div>
-            <p class="order-summary" id="dashboard-order-summary">今のところ発注は不要です</p>
-            <ul class="mini-order-list" id="dashboard-order-list"></ul>
-          </article>
-        </section>
+  <!-- 天気 -->
+  <section class="card">
+    <h2>天気(7日間)<button class="ghost" style="padding:2px 10px;font-size:.75rem" onclick="loadWeather()">更新</button></h2>
+    <div class="weather-days" id="weatherRow"></div>
+    <div class="weather-fallback" id="weatherMsg">天気を取得中…</div>
+  </section>
 
-        <section class="content-grid">
-          <article class="panel">
-            <div class="panel-header">
-              <h3>要注意の品目</h3>
-              <a href="inventory.html" class="text-link" data-nav-target="inventory.html" data-nav-message="在庫一覧を表示しています">一覧を見る</a>
-            </div>
-            <ul class="item-list" id="alert-list">
-            </ul>
-          </article>
-
-          <article class="panel">
-            <div class="panel-header">
-              <h3>クイック操作</h3>
-            </div>
-            <div class="quick-actions">
-              <a class="secondary-btn" href="inventory.html" data-nav-target="inventory.html" data-nav-message="在庫一覧を表示しています">在庫一覧</a>
-              <a class="secondary-btn" href="register.html" data-nav-target="register.html" data-nav-message="入出庫登録画面を開きます">入出庫を記録</a>
-              <a class="secondary-btn" href="#">発注予定を見る</a>
-            </div>
-          </article>
-        </section>
-      </main>
+  <!-- 在庫 -->
+  <section class="card" style="grid-column:1 / -1">
+    <h2>在庫</h2>
+    <ul class="stock" id="stockList"></ul>
+    <div class="add-row">
+      <input class="name" id="newName" placeholder="品名(例: 米)">
+      <input class="num" id="newQty" type="number" placeholder="数量">
+      <input class="num" id="newUnit" placeholder="単位" style="width:60px">
+      <input class="num" id="newMin" type="number" placeholder="警告値">
+      <button onclick="addStock()">追加</button>
     </div>
-  </body>
+    <p class="hint">「警告値」以下になると赤く表示されます。数値はこの端末に自動保存されます。</p>
+  </section>
+
+</div>
+
+<!-- 日付タップ用ダイアログ -->
+<dialog id="dayDialog">
+  <h3 id="dlgTitle"></h3>
+  <input type="number" id="dlgInput" min="0" placeholder="出数(人数)">
+  <div class="dlg-actions">
+    <button class="ghost" onclick="dayDialog.close()">閉じる</button>
+    <button onclick="saveDayRecord()">保存</button>
+  </div>
+</dialog>
+
+<script>
+/* =========================================================
+   保存まわり(localStorageが使えない環境でも動くように保険)
+========================================================= */
+const memory = {};
+function store(key, val){
+  memory[key] = val;
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){}
+}
+function load(key, fallback){
+  try {
+    const v = localStorage.getItem(key);
+    if (v !== null) return JSON.parse(v);
+  } catch(e){}
+  return key in memory ? memory[key] : fallback;
+}
+
+/* =========================================================
+   日付ユーティリティ
+========================================================= */
+const WEEK = ["日","月","火","水","木","金","土"];
+function ymd(d){
+  return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+}
+const today = new Date();
+
+/* 2026年の日本の祝日(振替休日含む) */
+const HOLIDAYS = {
+  "2026-01-01":"元日","2026-01-12":"成人の日","2026-02-11":"建国記念の日",
+  "2026-02-23":"天皇誕生日","2026-03-20":"春分の日","2026-04-29":"昭和の日",
+  "2026-05-03":"憲法記念日","2026-05-04":"みどりの日","2026-05-05":"こどもの日",
+  "2026-05-06":"振替休日","2026-07-20":"海の日","2026-08-11":"山の日",
+  "2026-09-21":"敬老の日","2026-09-22":"国民の休日","2026-09-23":"秋分の日",
+  "2026-10-12":"スポーツの日","2026-11-03":"文化の日","2026-11-23":"勤労感謝の日"
+};
+
+document.getElementById("todayLabel").textContent =
+  `${today.getMonth()+1}月${today.getDate()}日(${WEEK[today.getDay()]})` +
+  (HOLIDAYS[ymd(today)] ? " ・" + HOLIDAYS[ymd(today)] : "");
+
+/* =========================================================
+   カレンダー
+========================================================= */
+let calYear = today.getFullYear();
+let calMonth = today.getMonth(); // 0始まり
+
+function moveMonth(diff){
+  calMonth += diff;
+  if (calMonth < 0){ calMonth = 11; calYear--; }
+  if (calMonth > 11){ calMonth = 0; calYear++; }
+  renderCalendar();
+}
+
+function renderCalendar(){
+  document.getElementById("calTitle").textContent = `${calYear}年${calMonth+1}月`;
+  const first = new Date(calYear, calMonth, 1);
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  const records = load("records", {});
+  let html = "<tr>";
+  for (let i = 0; i < first.getDay(); i++) html += "<td></td>";
+  for (let d = 1; d <= daysInMonth; d++){
+    const date = new Date(calYear, calMonth, d);
+    const key = ymd(date);
+    const dow = date.getDay();
+    const cls = [];
+    if (key === ymd(today)) cls.push("today");
+    if (dow === 6) cls.push("sat");
+    if (dow === 0) cls.push("sun");
+    if (HOLIDAYS[key]) cls.push("holiday");
+    const rec = records[key] !== undefined ? `<span class="mark">${records[key]}人</span>` : "";
+    const hname = HOLIDAYS[key] ? `<span class="holiday-name">${HOLIDAYS[key]}</span>` : "";
+    html += `<td class="${cls.join(" ")}" onclick="openDay('${key}')"><span class="num">${d}</span>${hname}${rec}</td>`;
+    if (dow === 6 && d !== daysInMonth) html += "</tr><tr>";
+  }
+  html += "</tr>";
+  document.getElementById("calBody").innerHTML = html;
+}
+
+/* 日付タップ → 実績入力 */
+const dayDialog = document.getElementById("dayDialog");
+let editingKey = null;
+function openDay(key){
+  editingKey = key;
+  const records = load("records", {});
+  const [y,m,d] = key.split("-").map(Number);
+  const dow = WEEK[new Date(y, m-1, d).getDay()];
+  document.getElementById("dlgTitle").textContent = `${m}月${d}日(${dow})の出数`;
+  document.getElementById("dlgInput").value = records[key] ?? "";
+  dayDialog.showModal();
+}
+function saveDayRecord(){
+  const v = document.getElementById("dlgInput").value;
+  const records = load("records", {});
+  if (v === "") delete records[editingKey];
+  else records[editingKey] = Number(v);
+  store("records", records);
+  dayDialog.close();
+  renderCalendar();
+  renderForecast();
+}
+
+/* =========================================================
+   天気(Open-Meteo: APIキー不要・無料)
+========================================================= */
+const WMO_ICON = code => {
+  if (code === 0) return "☀️";
+  if (code <= 2) return "🌤️";
+  if (code === 3) return "☁️";
+  if (code <= 48) return "🌫️";
+  if (code <= 67) return "🌧️";
+  if (code <= 77) return "🌨️";
+  if (code <= 82) return "🌧️";
+  if (code <= 86) return "🌨️";
+  return "⛈️";
+};
+let todayRainProb = null; // 出数予測に使う
+
+async function loadWeather(){
+  const msg = document.getElementById("weatherMsg");
+  msg.textContent = "天気を取得中…";
+  // 店の場所に合わせて緯度経度を変えてください(初期値: 東京)
+  const LAT = 35.68, LON = 139.76;
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}`
+    + `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max`
+    + `&timezone=Asia%2FTokyo&forecast_days=7`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    const D = data.daily;
+    let html = "";
+    for (let i = 0; i < D.time.length; i++){
+      const dt = new Date(D.time[i] + "T00:00:00");
+      const isToday = D.time[i] === ymd(today);
+      if (isToday) todayRainProb = D.precipitation_probability_max[i];
+      html += `<div class="wday${isToday ? " today" : ""}">
+        <div class="d">${dt.getMonth()+1}/${dt.getDate()}(${WEEK[dt.getDay()]})</div>
+        <div class="icon">${WMO_ICON(D.weather_code[i])}</div>
+        <div class="t">${Math.round(D.temperature_2m_max[i])}° <span class="lo">/ ${Math.round(D.temperature_2m_min[i])}°</span></div>
+        <div class="p">${D.precipitation_probability_max[i] != null ? "☂ " + D.precipitation_probability_max[i] + "%" : ""}</div>
+      </div>`;
+    }
+    document.getElementById("weatherRow").innerHTML = html;
+    msg.textContent = "";
+    renderForecast();
+  } catch(e){
+    msg.textContent = "天気を取得できませんでした(通信環境やプレビュー環境の制限の可能性があります)。GitHub Pagesに公開した状態では動作します。";
+  }
+}
+
+/* =========================================================
+   出数予測:同じ曜日の実績平均 × 雨補正
+========================================================= */
+function renderForecast(){
+  const records = load("records", {});
+  const dow = today.getDay();
+  const values = [];
+  for (const key in records){
+    if (key === ymd(today)) continue; // 今日の実績は予想には使わない
+    const [y,m,d] = key.split("-").map(Number);
+    if (new Date(y, m-1, d).getDay() === dow) values.push(records[key]);
+  }
+  const numEl = document.getElementById("forecastNum");
+  const noteEl = document.getElementById("forecastNote");
+  if (values.length === 0){
+    numEl.textContent = "--";
+    noteEl.textContent = `まだ${WEEK[dow]}曜日の実績データがありません。毎日「今日の実績」を記録すると予想が出るようになります。`;
+    return;
+  }
+  const recent = values.slice(-8); // 直近8回分
+  let avg = recent.reduce((a,b)=>a+b,0) / recent.length;
+  let note = `${WEEK[dow]}曜日 直近${recent.length}回の平均から算出。`;
+  if (todayRainProb !== null && todayRainProb >= 60){
+    avg *= 0.85;
+    note += `降水確率${todayRainProb}%のため15%減で見ています。`;
+  }
+  numEl.textContent = Math.round(avg);
+  noteEl.textContent = note;
+}
+
+function saveActual(){
+  const v = document.getElementById("actualInput").value;
+  if (v === "") return;
+  const records = load("records", {});
+  records[ymd(today)] = Number(v);
+  store("records", records);
+  document.getElementById("actualInput").value = "";
+  renderCalendar();
+  renderForecast();
+  alert("今日の実績を記録しました!");
+}
+
+/* =========================================================
+   在庫
+========================================================= */
+const DEFAULT_STOCK = [
+  {name:"米", qty:20, unit:"kg", min:5},
+  {name:"玉ねぎ", qty:8, unit:"個", min:10},
+  {name:"割り箸", qty:300, unit:"膳", min:100}
+];
+
+function getStock(){ return load("stock", DEFAULT_STOCK); }
+
+function renderStock(){
+  const list = getStock();
+  const ul = document.getElementById("stockList");
+  ul.innerHTML = "";
+  list.forEach((item, i) => {
+    const li = document.createElement("li");
+    if (item.qty <= item.min) li.className = "low";
+    li.innerHTML = `
+      <span class="stock-name">${item.name}</span>
+      <button class="qty-btn" onclick="changeQty(${i},-1)">−</button>
+      <span class="stock-qty">${item.qty}<span class="unit"> ${item.unit}</span></span>
+      <button class="qty-btn" onclick="changeQty(${i},1)">+</button>
+      <button class="del-btn" onclick="deleteStock(${i})" title="削除">✕</button>`;
+    ul.appendChild(li);
+  });
+  if (list.length === 0){
+    ul.innerHTML = '<li style="color:var(--sub)">在庫がまだ登録されていません。下のフォームから追加してください。</li>';
+  }
+}
+function changeQty(i, diff){
+  const list = getStock();
+  list[i].qty = Math.max(0, list[i].qty + diff);
+  store("stock", list);
+  renderStock();
+}
+function deleteStock(i){
+  const list = getStock();
+  if (!confirm(`「${list[i].name}」を削除しますか?`)) return;
+  list.splice(i, 1);
+  store("stock", list);
+  renderStock();
+}
+function addStock(){
+  const name = document.getElementById("newName").value.trim();
+  const qty  = Number(document.getElementById("newQty").value);
+  const unit = document.getElementById("newUnit").value.trim() || "個";
+  const min  = Number(document.getElementById("newMin").value) || 0;
+  if (!name){ alert("品名を入力してください"); return; }
+  const list = getStock();
+  list.push({name, qty: isNaN(qty) ? 0 : qty, unit, min});
+  store("stock", list);
+  ["newName","newQty","newUnit","newMin"].forEach(id => document.getElementById(id).value = "");
+  renderStock();
+}
+
+/* =========================================================
+   初期表示
+========================================================= */
+renderCalendar();
+renderStock();
+renderForecast();
+loadWeather();
+</script>
+</body>
 </html>
